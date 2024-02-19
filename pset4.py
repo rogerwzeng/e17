@@ -227,23 +227,23 @@ where $d_t$ is the distance travelled by the reference point at time $t$ and $\D
 
 #@markdown Reference point $(x, y)$ coordinate at time $t = 1$ (4 pts - the $x$ and $y$ are each 2 points)
 x_coordinate_absolute_position_time_1 = "2.3263" #@param {type: "string"}
-y_coordinate_absolute_position_time_1 = "-0.6979" #@param {type: "string"}
+y_coordinate_absolute_position_time_1 = "-0.9157" #@param {type: "string"}
 
 #@markdown Reference point $(x, y)$ coordinate at time $t = 2$ (4 pts - the $x$ and $y$ are each 2 points)
 x_coordinate_absolute_position_time_2 = "4.0729" #@param {type: "string"}
-y_coordinate_absolute_position_time_2 = "0.9239" #@param {type: "string"}
+y_coordinate_absolute_position_time_2 = "-0.8064" #@param {type: "string"}
 
 #@markdown Reference point $(x, y)$ coordinate at time $t = 3$ (4 pts - the $x$ and $y$ are each 2 points)
 x_coordinate_absolute_position_time_3 = "4.2674" #@param {type: "string"}
-y_coordinate_absolute_position_time_3 = "1.0124" #@param {type: "string"}
+y_coordinate_absolute_position_time_3 = "1.9367" #@param {type: "string"}
 
 #@markdown Reference point $(x, y)$ coordinate at time $t = 4$ (4 pts - the $x$ and $y$ are each 2 points)
 x_coordinate_absolute_position_time_4 = "3.3979" #@param {type: "string"}
-y_coordinate_absolute_position_time_4 = "0.1429" #@param {type: "string"}
+y_coordinate_absolute_position_time_4 = "2.4307" #@param {type: "string"}
 
 #@markdown Reference point $(x, y)$ coordinate at time $t = 5$ (4 pts - the $x$ and $y$ are each 2 points)
 x_coordinate_absolute_position_time_5 = "0.8982" #@param {type: "string"}
-y_coordinate_absolute_position_time_5 = "0.1429" #@param {type: "string"}
+y_coordinate_absolute_position_time_5 = "2.4721" #@param {type: "string"}
 
 """## EXTRA CREDIT: Wheel Odometry Model - Absolute Orientation (10 pts)
 
@@ -303,9 +303,9 @@ DIFFICULTY = "5" #@param ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 
 FAVORITE_PART = "Absolute Position calculation was a good validation in the end" #@param {type:"string"}
 
-WENT_WELL = "Incremental position and orientation calculation was key to odometry" #@param {type:"string"}
+WENT_WELL = "Incremental position and orientation calculation was key to correct odometry values " #@param {type:"string"}
 
-CHALLENGING = "Absolute orientation unit vector was calculated with rotation matrix" #@param {type:"string"}
+CHALLENGING = "Absolute orientation unit vector was calculated with rotation matrix from linear algrebra" #@param {type:"string"}
 
 COMMENTARY = "" #@param {type:"string"}
 
