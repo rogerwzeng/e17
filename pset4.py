@@ -65,7 +65,7 @@ scenario7 = "Stationary" #@param ["", "Forward Left", "Forward Straight", "Forwa
 
 #@markdown #### Scenario8 (1 pt)
 #@markdown  Only the left wheel is spinning forward and the surface is very smooth (meaning the other wheel will glide in place)
-scenario8 = "Forward Straight" #@param ["", "Forward Left", "Forward Straight", "Forward Right", "Backward Left", "Backward Straight", "Backward Right", "Stationary", "Spinning in Place"]
+scenario8 = "Forward Right" #@param ["", "Forward Left", "Forward Straight", "Forward Right", "Backward Left", "Backward Straight", "Backward Right", "Stationary", "Spinning in Place"]
 
 #@markdown #### Scenario9 (1 pt)
 #@markdown  Only the left wheel is spinning forward and the surface is very rough (meaning the other wheel will have a lot of friction to overcome and can not move)
