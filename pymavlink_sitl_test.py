@@ -7,7 +7,7 @@ from pymavlink import mavutil
 def connect_vehicle(connection_string):
 
     if not connection_string :
-        connection_string = 'udp:127.0.0.1:14551'
+        connection_string = 'udp:127.0.0.1:14551'  # default link port
 
     print('Connecting to vehicle on: %s' % connection_string)
 
@@ -20,12 +20,18 @@ def connect_vehicle(connection_string):
 
 # Function to arm and take off
 def arm_and_takeoff(vehicle, target_altitude):
-    # Copter should arm in GUIDED mode
+    guided_mode = vehicle.mode_mapping()["GUIDED"]
+    #print(f"Guided Mode is {guided_mode}")
+    takeoff_params = [0,0,0,0,0,0,target_altitude]
+
     vehicle.mav.command_long_send(
         vehicle.target_system,
         vehicle.target_component,
-        mavutil.mavlink.MAV_CMD_NAV_GUIDED_ENABLE,
-        0, 1, 0, 0, 0, 0, 0, 0)
+        mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0,
+        mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+        guided_mode, 0, 0, 0, 0, 0)
+    ack_msg = vehicle.recv_match(type='COMMAND_ACK', blocking=True, timeout=5)
+    print(f"Change mode to Guided: {ack_msg}")
 
     # Confirm vehicle armed before attempting to take off
     print("Arming motors")
@@ -47,20 +53,17 @@ def arm_and_takeoff(vehicle, target_altitude):
         0, 0, 0, 0, 0, 0, 0, target_altitude)
 
     # Wait until the vehicle reaches a safe height
-    altitude = 0
-    while altitude < target_altitude * 0.95 :
+    while True:
         # Request altitude
-        vehicle.mav.request_data_stream_send(vehicle.target_system, 
-                    vehicle.target_component, 
-                    mavutil.mavlink.
-                    MAV_DATA_STREAM_POSITION, 1, 1)
+        vehicle.mav.request_data_stream_send(vehicle.target_system, vehicle.target_component, mavutil.mavlink.MAV_DATA_STREAM_POSITION, 1, 1)
         msg = vehicle.recv_match(type='GLOBAL_POSITION_INT', blocking=True)
         altitude = msg.alt / 1000.0  # Convert from mm to m
 
         print("Altitude:", altitude)
+        if altitude >= target_altitude * 0.95:  # Just below target, in meters
+            print("Reached target altitude")
+            break
         time.sleep(1)
-
-    print("Reached target altitude")
 
 # Landing
 def land_vehicle(connection):
@@ -113,39 +116,25 @@ def upload_mission(connection, filename):
             print("Mission upload SUCCESS!")
         else:
             print("Mission upload FAILED!")
+        
+        return len(mission_items)
 
-def set_mode(connection, mode):
-    connection.mav.set_mode_send(
-        connection.target_system,
-        mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 4)  # Mode 4 for AUTO 
+# Set the drone to ARMED AUTO mode
+def set_mode_auto(vehicle):
+    # Change mode to AUTO
+    auto_mode = vehicle.mode_mapping()["AUTO"]
+    print(f"Auto Mode is {auto_mode}")
+
+    vehicle.mav.command_long_send(
+        vehicle.target_system,
+        vehicle.target_component,
+        mavutil.mavlink.MAV_CMD_DO_SET_MODE, 0,
+        mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+        auto_mode, 0, 0, 0, 0, 0)
+    ack_msg = vehicle.recv_match(type='COMMAND_ACK', blocking=True, timeout=5)
+
     print("Mode set to AUTO")
 
-#def arm_and_takeoff(connection, aTargetAltitude):
-#    print("Basic pre-arm checks")
-#    while not connection.home_position_valid:
-#        print("Waiting for home position...")
-#        time.sleep(1)
-#
-#    print("Arming motors")
-#    connection.mav.command_long_send(
-#        connection.target_system, connection.target_component,
-#        mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0)
-#    while not connection.motors_armed():
-#        print(" Waiting for arming...")
-#        time.sleep(1)
-#
-#    print("Taking off!")
-#    connection.mav.command_long_send(
-#        connection.target_system, connection.target_component,
-#        mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, aTargetAltitude)
-#    while True:
-#        alt = connection.recv_match(type='VFR_HUD', blocking=True).alt
-#        print(" Altitude:", alt)
-#        if alt >= aTargetAltitude * 0.95:
-#            print("Reached target altitude")
-#            break
-#        time.sleep(1)
-#
 
 # Protected main
 if __name__ == "__main__":
@@ -163,21 +152,28 @@ if __name__ == "__main__":
     # Mission workflow
     copter = connect_vehicle(connection_string)
     clear_mission(copter)
-    num_waypoints = upload_mission(copter, mission_file)
-    arm_and_takeoff(copter,20)
-    set_mode_auto(copter)
+    waypoints = upload_mission(copter, mission_file)
+    arm_and_takeoff(copter,20)  # initial height 20m
+    time.sleep(5)  # let the copter catches its breath, before ..
+    set_mode_auto(copter)  # execute the mission
 
     # Monitor mission progress
+    current_wp = 0
     while True:
-        next_wp = connection.recv_match(type='MISSION_CURRENT', blocking=True).seq
-        print(f"Reached waypoint #{next_wp}")
+        next_wp = copter.recv_match(type='MISSION_CURRENT', blocking=True, timeout=5).seq
+        if next_wp == current_wp:
+            continue
 
-        if next_wp == num_waypoints - 1:  # Check if this is the last waypoint
+        # We've reached a new waypoint
+        print(f"Reached waypoint {next_wp}")
+        current_wp = next_wp
+
+        # Have we done all waypoints?
+        if next_wp == waypoints - 1:
             # Land and finish
             land_vehicle(copter)
             print("Mission Completed")
             break
-
-        time.sleep(2)
+        time.sleep(5)
 
 
