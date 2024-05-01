@@ -54,7 +54,7 @@ class ServerArchitecture(Scene):
             self.play(Create(line))
             # mission plan animation
             mission_packet = Rectangle(width=0.6, height=0.4, color=RED)
-            mission_text = Text("QGC", font_size=14).move_to(mission_packet.get_center())
+            mission_text = Text("QGC", font_size=14, color=RED, slant=ITALIC, weight=ULTRAHEAVY).move_to(mission_packet.get_center())
             packet_group = VGroup(mission_packet, mission_text)
             packet_group.move_to(line.get_start())
             self.play(MoveAlongPath(packet_group, line), run_time=2)
@@ -84,7 +84,7 @@ class ServerArchitecture(Scene):
 
         # Animation of send mission plan to drone
         mission_plan = Rectangle(width=0.6, height=0.4, color=RED)
-        mission_text = Text("QGC", font_size=14).move_to(mission_plan.get_center())
+        mission_text = Text("QGC", font_size=14, color=RED, slant=ITALIC, weight=ULTRAHEAV).move_to(mission_plan.get_center())
         mission_group = VGroup(mission_plan, mission_text)
         mission_group.move_to(flight_line.get_start())
         self.play(MoveAlongPath(mission_group, flight_line), run_time=2)
