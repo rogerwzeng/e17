@@ -167,13 +167,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='commands')
     parser.add_argument('--connect')
     parser.add_argument('--mission')
+    parser.add_argument('--pptype')
     args = parser.parse_args()
 
     # Connect to quadcopter
     connection_string = args.connect
     mission_file = args.mission
+    path_planning_type = args.mission
 
-    print(f"Connection String: {connection_string} ; Mission: {mission_file}")
+    print(f"Connection String: {connection_string}")
+    print(f"Mission Data: {mission_file}")
+    print(f"Path Planning Type: {path_planning_type}")
 
     # Mission Preparation
     copter = connect_vehicle(connection_string)
